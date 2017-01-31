@@ -13,32 +13,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     {
 
     }
-    public void deposit(int account, int amount) throws RemoteException, InvalidSession {
-
-        // implementation code
-
-    }
-
-    public void withdraw(int account, int amount) throws RemoteException, InvalidSession {
-
-        // implementation code
-
-    }
-
-    public int inquiry(int account) throws RemoteException, InvalidSession {
-
-        // implementation code
-        return 0;
-
-    }
-
-    public Statement getStatement(Date from, Date to) throws RemoteException, InvalidSession {
-
-        // implementation code
-        return null;
-
-    }
-
+    
     public static void main(String args[]) throws Exception {
 
         // initialise Bank server - see sample code in the notes for details
