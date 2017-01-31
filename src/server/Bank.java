@@ -1,5 +1,10 @@
 package server;
 
+import client.Account;
+import client.StatementInterface;
+import exceptions.InvalidLogin;
+import exceptions.InvalidSession;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
@@ -13,7 +18,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     {
 
     }
-    
+
     public static void main(String args[]) throws Exception {
 
         // initialise Bank server - see sample code in the notes for details
@@ -41,7 +46,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     }
 
     @Override
-    public Statement getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSession {
+    public StatementInterface getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSession {
         return null;
     }
 }
