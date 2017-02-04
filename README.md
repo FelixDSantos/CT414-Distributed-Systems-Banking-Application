@@ -1,4 +1,4 @@
-# CT414-Distribued-Systems-Banking-Application
+# CT414-Distributed-Systems-Banking-Application
 
 Problem Description
 
