@@ -7,7 +7,10 @@ import exceptions.InvalidLoginException;
 import exceptions.InvalidSessionException;
 
 import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,11 +39,24 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
         // initialise Bank server - see sample code in the notes for details
         try {
+            System.setSecurityManager(new RMISecurityManager());
+            System.out.println("Security Manager Set.");
+            Bank bankserver = new Bank();
+//            Registry reg = LocateRegistry.getRegistry();
             BankInterface bank = new Bank();
-            Naming.rebind("Bank", bank);
+//            reg.bind("Bank", bank);
+
+            Naming.rebind("Bank", bankserver);
+            System.out.println("Instance of Bank Server Created");
+            System.out.println("Server Ready");
         } catch (Exception e) {
 
         }
+    }
+
+    @Override
+    public void test(){
+        System.out.println("TEST CALLED");
     }
 
     @Override
@@ -56,6 +72,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
         }
         return 0;
     }
+
 
     @Override
     public void deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
