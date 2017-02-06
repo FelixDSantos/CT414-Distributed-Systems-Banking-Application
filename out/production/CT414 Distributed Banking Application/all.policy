@@ -1,3 +1,0 @@
-grant codeBase "file:/Users/FelixDSantos/CT414/CT414-Distribued-Systems-Banking-Application/src"{
-    permission java.security.AllPermission;
-}

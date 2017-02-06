@@ -7,11 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1db1cb9-fc3d-4445-860d-cd480d175dbc" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/all.policy" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/CT414 Distributed Banking Application/all.policy" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/client/ATM.java" afterPath="$PROJECT_DIR$/src/client/ATM.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/Bank.java" afterPath="$PROJECT_DIR$/src/server/Bank.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/BankInterface.java" afterPath="$PROJECT_DIR$/src/server/BankInterface.java" />
     </list>
     <ignored path="CT414 Distributed Banking Application.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -125,11 +123,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="all.policy" pinned="false" current-in-tab="true">
+      <file leaf-file-name="all.policy" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/all.policy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="30">
               <caret line="2" column="2" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="6" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -171,6 +179,7 @@
         <option value="$PROJECT_DIR$/src/server/BankInterface.java" />
         <option value="$PROJECT_DIR$/src/server/Bank.java" />
         <option value="$PROJECT_DIR$/src/all.policy" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -705,7 +714,7 @@
       <option name="presentableId" value="Default" />
       <updated>1485341003555</updated>
       <workItem from="1485890642112" duration="87000" />
-      <workItem from="1486219282128" duration="11835000" />
+      <workItem from="1486219282128" duration="12126000" />
     </task>
     <task id="LOCAL-00001" summary="Update code">
       <created>1485882977436</created>
@@ -725,7 +734,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11922000" />
+    <option name="totallyTimeSpent" value="12213000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="71" y="23" width="1349" height="831" extended-state="0" />
@@ -1056,6 +1065,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="2" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="6" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
           <folding />
         </state>
       </provider>
