@@ -20,4 +20,5 @@ public interface BankInterface extends Remote {
 
     public StatementInterface getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException;
 
+    public void test();
 }
