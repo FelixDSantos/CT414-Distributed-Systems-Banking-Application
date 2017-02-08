@@ -1,4 +1,4 @@
-package client;
+package server;
 
 import java.io.Serializable;
 
@@ -8,29 +8,27 @@ import java.io.Serializable;
 public class Account implements Serializable {
 
     private double balance;
-    private String password;
+    private String username, password;
     private int accountNumber;
     private static int nextAcNum = 88769912;
 
     public Account (String uName, String pass) {
-        this.userName = uName;
+        this.username = uName;
         this.password = pass;
         this.accountNumber = nextAcNum;
         nextAcNum++;
     }
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.username = userName;
     }
 
-    private String userName;
-
     public double getBalance() {
-        return balance;
+        return this.balance;
     }
 
     public void setBalance(double balance) {
@@ -38,7 +36,7 @@ public class Account implements Serializable {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
@@ -46,7 +44,7 @@ public class Account implements Serializable {
     }
 
     public int getAccountNumber() {
-        return accountNumber;
+        return this.accountNumber;
     }
 
     public void setAccountNumber(int accountNumber) {
