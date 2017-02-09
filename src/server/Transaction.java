@@ -50,4 +50,9 @@ public class Transaction implements Serializable {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return this.date.toString() + " " + this.type + " " + this.amount;
+    }
 }

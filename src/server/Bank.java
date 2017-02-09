@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Bank implements BankInterface {
+public class Bank extends UnicastRemoteObject implements BankInterface {
 
     private List<Account> accounts; // users accounts
     private List<Session> sessions, deadSessions;
@@ -34,9 +34,9 @@ public class Bank implements BankInterface {
             System.out.println("Security Manager Set.");
             String name = "Bank";
             BankInterface bank = new Bank();
-            BankInterface stub = (BankInterface) UnicastRemoteObject.exportObject(bank, 0);
+//            BankInterface stub = (BankInterface) UnicastRemoteObject.exportObject(bank, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(name, stub);
+            registry.rebind(name, bank);
             System.out.println("Bank server bound");
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,23 +58,26 @@ public class Bank implements BankInterface {
     }
 
     @Override
-    public void deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
+    public double deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
+            Account account;
             try {
-                Account account = getAccount(accountnum);
+                account = getAccount(accountnum);
                 account.setBalance(account.getBalance() + amount);
                 Transaction t = new Transaction(accountnum, "Deposit");
                 t.setAmount(amount);
                 t.setDate(new Date(System.currentTimeMillis()));
                 account.addTransaction(t);
+                return account.getBalance();
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
+        return 0;
     }
 
     @Override
-    public void withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
+    public double withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
             try {
                 Account account = getAccount(accountnum);
@@ -85,25 +88,28 @@ public class Bank implements BankInterface {
                     t.setAmount(accountnum);
                     t.setDate(new Date(System.currentTimeMillis()));
                     account.addTransaction(t);
+
+                    return account.getBalance();
                 }
                 else System.out.println("Insufficient Funds");
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
+        return 0;
     }
 
     @Override
-    public double inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
+    public Account inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
             try {
                 Account account = getAccount(accountnum);
-                return account.getBalance();
+                return account;
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
-        return 0;
+        return null;
     }
 
     @Override
@@ -132,7 +138,10 @@ public class Bank implements BankInterface {
     private boolean checkSessionActive(int acNum) throws InvalidSessionException{
         String accNum = String.valueOf(acNum);
         for(Session s : sessions){
-            if(!s.isAlive()) deadSessions.add(s);
+            if(!s.isAlive()) {
+                System.out.println(s);
+                deadSessions.add(s);
+            }
             if(s.getClientId().equals(accNum) && s.isAlive()) return true;
         }
         // cleanup dead sessions
