@@ -1,7 +1,9 @@
 package interfaces;
 
+import exceptions.InvalidAccountException;
 import exceptions.InvalidLoginException;
 import exceptions.InvalidSessionException;
+import exceptions.StatementException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -12,5 +14,5 @@ public interface BankInterface extends Remote {
     void deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException;
     void withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException;
     double inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException;
-    StatementInterface getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException;
+    StatementInterface getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException, StatementException;
 }

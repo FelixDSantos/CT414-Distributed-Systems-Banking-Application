@@ -60,13 +60,15 @@ public class Bank implements BankInterface {
     @Override
     public void deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            Account account = getAccount(accountnum);
-            if(account != null) {
+            try {
+                Account account = getAccount(accountnum);
                 account.setBalance(account.getBalance() + amount);
                 Transaction t = new Transaction(accountnum, "Deposit");
                 t.setAmount(amount);
                 t.setDate(new Date(System.currentTimeMillis()));
                 account.addTransaction(t);
+            } catch (InvalidAccountException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -74,8 +76,8 @@ public class Bank implements BankInterface {
     @Override
     public void withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            Account account = getAccount(accountnum);
-            if(account != null){
+            try {
+                Account account = getAccount(accountnum);
                 if (account.getBalance() > 0 && account.getBalance() - amount > 0) {
                     account.setBalance(account.getBalance() - amount);
 
@@ -85,6 +87,8 @@ public class Bank implements BankInterface {
                     account.addTransaction(t);
                 }
                 else System.out.println("Insufficient Funds");
+            } catch (InvalidAccountException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -92,35 +96,40 @@ public class Bank implements BankInterface {
     @Override
     public double inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            Account account = getAccount(accountnum);
-            if(account != null) return account.getBalance();
+            try {
+                Account account = getAccount(accountnum);
+                return account.getBalance();
+            } catch (InvalidAccountException e) {
+                e.printStackTrace();
+            }
         }
         return 0;
     }
 
     @Override
-    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException {
+    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException, StatementException {
         if(checkSessionActive(accountnum)) {
-            Account account = getAccount(accountnum);
-            if (account != null) {
+            try {
+                Account account = getAccount(accountnum);
                 Statement s = new Statement(account, from, to);
-                System.out.println(s.getTransations());
+                return s;
+            } catch (InvalidAccountException e) {
+                e.printStackTrace();
             }
         }
-        return null;
+        throw new StatementException("Could not generate statement for given account and dates");
     }
 
-    private Account getAccount(int acnum) {
+    private Account getAccount(int acnum) throws InvalidAccountException{
         for(Account acc:accounts){
             if(acc.getAccountNumber() == acnum){
                 return  acc;
             }
         }
-        System.out.println("Account with account number: " + acnum + " does not exist");
-        return null;
+        throw new InvalidAccountException(acnum);
     }
 
-    private boolean checkSessionActive(int acNum) {
+    private boolean checkSessionActive(int acNum) throws InvalidSessionException{
         String accNum = String.valueOf(acNum);
         for(Session s : sessions){
             if(!s.isAlive()) deadSessions.add(s);
@@ -128,7 +137,6 @@ public class Bank implements BankInterface {
         }
         // cleanup dead sessions
         sessions.removeAll(deadSessions);
-        System.out.println("Session deacivated, please log in again");
-        return false;
+        throw new InvalidSessionException();
     }
 }
