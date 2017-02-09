@@ -23,6 +23,7 @@ public class Session extends TimerTask {
         this.timeAlive = 0;
         this.timer = new Timer();
         this.startTimer();
+        System.out.println("New session created");
     }
 
     private void startTimer() {

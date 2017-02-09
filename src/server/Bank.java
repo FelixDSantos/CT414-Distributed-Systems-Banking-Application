@@ -1,24 +1,25 @@
 package server;
 
-import exceptions.InvalidLoginException;
-import exceptions.InvalidSessionException;
-import java.rmi.Naming;
+import exceptions.*;
+import interfaces.*;
+
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Bank extends UnicastRemoteObject implements BankInterface {
+public class Bank implements BankInterface {
 
     private List<Account> accounts; // users accounts
-    private  List<Transaction> transactions;
     private List<Session> sessions, deadSessions;
 
     public Bank() throws RemoteException
     {
+        super();
         accounts = new ArrayList<>();
-        transactions = new ArrayList<>();
         sessions = new ArrayList<>();
         deadSessions = new ArrayList<>();
 
@@ -29,26 +30,23 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     public static void main(String args[]) throws Exception {
         try {
-            System.setSecurityManager(new SecurityManager());
+//            System.setSecurityManager(new SecurityManager());
             System.out.println("Security Manager Set.");
-            Bank bankserver = new Bank();
-            Naming.rebind("Bank", bankserver);
-            System.out.println("Server Ready");
+            String name = "Bank";
+            BankInterface bank = new Bank();
+            BankInterface stub = (BankInterface) UnicastRemoteObject.exportObject(bank, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(name, stub);
+            System.out.println("Bank server bound");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void test(){
-        System.out.println("TEST CALLED");
-    }
-
-    @Override
     public long login(String username, String password) throws RemoteException, InvalidLoginException {
         for(Account acc : accounts) {
             if(username.equals(acc.getUserName()) && password.equals(acc.getPassword())){
-                // Create session here
                 sessions.add(new Session(String.valueOf(acc.getAccountNumber())));
                 System.out.println("Account: " + acc.getAccountNumber() + " logged in");
             }
@@ -62,17 +60,13 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     @Override
     public void deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            for (Account acc : accounts) {
-                if (accountnum == acc.getAccountNumber()) {
-                    acc.setBalance(acc.getBalance() + amount);
-
-                    // TODO: Create transaction object
-                    Transaction t = new Transaction();
-                    transactions.add(t);
-                    break;
-                } else {
-                    System.out.println("Account does not exist");
-                }
+            Account account = getAccount(accountnum);
+            if(account != null) {
+                account.setBalance(account.getBalance() + amount);
+                Transaction t = new Transaction(accountnum, "Deposit");
+                t.setAmount(amount);
+                t.setDate(new Date(System.currentTimeMillis()));
+                account.addTransaction(t);
             }
         }
     }
@@ -80,20 +74,17 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     @Override
     public void withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            for (Account acc : accounts) {
-                if (accountnum == acc.getAccountNumber()) {
-                    if (acc.getBalance() > 0 && acc.getBalance() - amount > 0) {
-                        acc.setBalance(acc.getBalance() - amount);
+            Account account = getAccount(accountnum);
+            if(account != null){
+                if (account.getBalance() > 0 && account.getBalance() - amount > 0) {
+                    account.setBalance(account.getBalance() - amount);
 
-                        Transaction t = new Transaction();
-                        transactions.add(t);
-                        break;
-                    } else {
-                        System.out.println("Insfufficient Funds");
-                    }
-                } else {
-                    System.out.println("Account does not exist");
+                    Transaction t = new Transaction(accountnum, "Withdrawal");
+                    t.setAmount(accountnum);
+                    t.setDate(new Date(System.currentTimeMillis()));
+                    account.addTransaction(t);
                 }
+                else System.out.println("Insufficient Funds");
             }
         }
     }
@@ -101,17 +92,31 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     @Override
     public double inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
         if(checkSessionActive(accountnum)) {
-            for (Account acc : accounts) {
-                if (acc.getAccountNumber() == accountnum) {
-                    return acc.getBalance();
-                }
-            }
+            Account account = getAccount(accountnum);
+            if(account != null) return account.getBalance();
         }
         return 0;
     }
 
     @Override
-    public Statement getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException {
+    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException {
+        if(checkSessionActive(accountnum)) {
+            Account account = getAccount(accountnum);
+            if (account != null) {
+                Statement s = new Statement(account, from, to);
+                System.out.println(s.getTransations());
+            }
+        }
+        return null;
+    }
+
+    private Account getAccount(int acnum) {
+        for(Account acc:accounts){
+            if(acc.getAccountNumber() == acnum){
+                return  acc;
+            }
+        }
+        System.out.println("Account with account number: " + acnum + " does not exist");
         return null;
     }
 

@@ -1,4 +1,4 @@
-package server;
+package interfaces;
 
 import java.io.Serializable;
 import java.util.Date;

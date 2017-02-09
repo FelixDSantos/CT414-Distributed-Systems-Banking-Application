@@ -1,33 +1,20 @@
 package client;
 
-import server.BankInterface;
+import interfaces.BankInterface;
 
-import java.rmi.Naming;
-import java.util.UUID;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class ATM {
 
-    private String clientID;
-
-    public ATM(String clientID) {
-        this.clientID = clientID;
-    }
-
     public static void main (String args[]) throws Exception {
-
-        ATM atm = new ATM(UUID.randomUUID().toString());
-
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
-    // get user’s input, and perform the operations
-        BankInterface bank = (BankInterface) Naming.lookup("//localhost/Bank");
         try{
-            bank.test();
-
+            String name = "Bank";
+            Registry registry = LocateRegistry.getRegistry(args[0]);
+            BankInterface bank = (BankInterface) registry.lookup(name);
+            System.out.println("client connected");
         }catch(Exception e){
             e.getStackTrace();
         }
     }
-
 }

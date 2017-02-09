@@ -1,6 +1,8 @@
 package server;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by I320246 on 25/01/2017.
@@ -11,12 +13,19 @@ public class Account implements Serializable {
     private String username, password;
     private int accountNumber;
     private static int nextAcNum = 88769912;
+    private List<Transaction> transactions;
 
     public Account (String uName, String pass) {
+        this.transactions = new ArrayList<>();
         this.username = uName;
         this.password = pass;
         this.accountNumber = nextAcNum;
+        this.balance = 0;
         nextAcNum++;
+    }
+
+    public void addTransaction(Transaction t) {
+        this.transactions.add(t);
     }
 
     public String getUserName() {
@@ -49,5 +58,9 @@ public class Account implements Serializable {
 
     public void setAccountNumber(int accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public List<Transaction> getTransactions(){
+        return this.transactions;
     }
 }
