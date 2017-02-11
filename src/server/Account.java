@@ -63,4 +63,9 @@ public class Account implements Serializable {
     public List<Transaction> getTransactions(){
         return this.transactions;
     }
+
+    @Override
+    public String toString() {
+        return this.accountNumber + " " + this.balance;
+    }
 }

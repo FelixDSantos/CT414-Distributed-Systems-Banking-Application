@@ -1,9 +1,6 @@
 package client;
 
-import exceptions.InvalidArgumentException;
-import exceptions.InvalidLoginException;
-import exceptions.InvalidSessionException;
-import exceptions.StatementException;
+import exceptions.*;
 import interfaces.BankInterface;
 import server.Account;
 import server.Statement;
@@ -18,6 +15,7 @@ public class ATM {
     static String operation, username, password;
     static BankInterface bank;
     static Date startDate, endDate;
+    static long sessionId = 0;
 
     public static void main (String args[]) {
         try {
@@ -25,7 +23,7 @@ public class ATM {
             String name = "Bank";
             Registry registry = LocateRegistry.getRegistry(serverAddress);
             bank = (BankInterface) registry.lookup(name);
-            System.out.println("client connected");
+            System.out.println("\n--------------------------\nClient Connected" + "\n--------------------------\n");
         } catch (InvalidArgumentException ie){
             ie.printStackTrace();
             System.out.println(ie);
@@ -37,56 +35,66 @@ public class ATM {
         switch (operation){
             case "login":
                 try {
-                    bank.login(username, password);
+                    sessionId = bank.login(username, password);
+                    Account acc = bank.accountDetails(sessionId);
+                    System.out.println("--------------------------\nAccount Details:\n--------------------------\n\n" + "Account Number: " + acc.getAccountNumber() +
+                                       "\nUsername: " + acc.getUserName() + "\nSessionID: " + sessionId + "\n");
+                    System.out.println("--------------------------\n");
+                    System.out.println("Use SessionID " + sessionId + " for all other operations");
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidLoginException e) {
+                    e.printStackTrace();
+                } catch (InvalidSessionException e) {
                     e.printStackTrace();
                 }
                 break;
             case "deposit":
                 try {
                     balance = bank.deposit(account, amount, account);
-                    System.out.println("Successfully deposited € " + balance + " into account " + account);
+                    System.out.println("Successfully deposited E" + amount + " into account " + account);
+                    System.out.println("New balance: E" + balance);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidSessionException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
                 break;
             case "withdraw":
                 try {
                     balance = bank.withdraw(account, amount, account);
-                    System.out.println("Successfully withdrew € " + amount + " from account " + account +
-                                       "\nRemaining Balance: " + balance);
+                    System.out.println("Successfully withdrew E " + amount + " from account " + account +
+                                       "\nRemaining Balance: E" + balance);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidSessionException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
                 break;
             case "inquiry":
                 try {
                     Account acc = bank.inquiry(account,account);
-                    System.out.println(acc);
+                    System.out.println("Balance for Account " + acc.getAccountNumber() + ": E" + acc.getBalance());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidSessionException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
                 break;
             case "statement":
                 Statement s = null;
                 try {
                     s = (Statement) bank.getStatement(account, startDate, endDate, account);
-                    for(Object t : s.getTransations()) System.out.println(t);
-                    System.out.println(s);
+                    System.out.println(s.getTransations());
+                    for(Object t : s.getTransations()) {
+                        System.out.println(t);
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidSessionException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 } catch (StatementException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
                 break;
             default:
@@ -107,8 +115,8 @@ public class ATM {
                 break;
             case "withdraw":
             case "deposit":
-                amount = Integer.parseInt(args[3]);
-                account = Integer.parseInt(args[4]);
+                amount = Integer.parseInt(args[4]);
+                account = Integer.parseInt(args[3]);
                 break;
             case "inquiry":
                 account = Integer.parseInt(args[3]);

@@ -46,7 +46,10 @@ public class Statement implements StatementInterface, Serializable {
     @Override
     public List getTransations() {
         for(Transaction t : this.account.getTransactions()){
-            if(t.getDate().after(this.startDate) && t.getDate().before(this.endDate)){
+            if(t.getDate().equals(this.startDate) || t.getDate().after(this.startDate)){
+                relevantTransactions.add(t);
+            }
+            else if(!t.getDate().before(this.endDate)){
                 relevantTransactions.add(t);
             }
         }
