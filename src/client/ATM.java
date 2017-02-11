@@ -37,9 +37,11 @@ public class ATM {
                 try {
                     sessionId = bank.login(username, password);
                     Account acc = bank.accountDetails(sessionId);
-                    System.out.println("--------------------------\nAccount Details:\n--------------------------\n\n" + "Account Number: " + acc.getAccountNumber() +
-                                       "\nUsername: " + acc.getUserName() + "\nSessionID: " + sessionId + "\n");
-                    System.out.println("--------------------------\n");
+                    System.out.println("--------------------------\nAccount Details:\n--------------------------\n" +
+                                       "Account Number: " + acc.getAccountNumber() +
+                                       "\nUsername: " + acc.getUserName() +
+                                       "\nSessionID: " + sessionId +
+                                       "\n--------------------------\n");
                     System.out.println("Use SessionID " + sessionId + " for all other operations");
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -74,7 +76,11 @@ public class ATM {
             case "inquiry":
                 try {
                     Account acc = bank.inquiry(account,account);
-                    System.out.println("Balance for Account " + acc.getAccountNumber() + ": E" + acc.getBalance());
+                    System.out.println("--------------------------\nAccount Details:\n--------------------------\n" +
+                            "Account Number: " + acc.getAccountNumber() +
+                            "\nUsername: " + acc.getUserName() +
+                            "\nBalance: E" + acc.getBalance() +
+                            "\n--------------------------\n");
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (InvalidSessionException e) {

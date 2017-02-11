@@ -160,11 +160,13 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
                 return true;
             }
             if(!s.isAlive()) {
-                System.out.println("\n---------------\nSession Timeout\n---------------");
-                System.out.println(s + "\n");
+                System.out.println("\n>> Cleaning up timed out sessions");
+                System.out.println(">> SessionID: " + s.getClientId());
                 deadSessions.add(s);
             }
         }
+        System.out.println();
+        
         // cleanup dead sessions
         sessions.removeAll(deadSessions);
         throw new InvalidSessionException();

@@ -40,6 +40,8 @@ public class Session extends TimerTask implements Serializable{
             this.alive = false;
             this.timer.cancel();
             System.out.println("\n---------------------------\nSession " + this.clientId + " terminated \n---------------------------");
+            System.out.println(this);
+            System.out.println("---------------------------");
         }
     }
 
@@ -65,6 +67,7 @@ public class Session extends TimerTask implements Serializable{
 
     @Override
     public String toString() {
-        return "Client ID: " + this.clientId +"\nTime Alive: " + this.timeAlive + "\nAlive: " +this.alive;
+        return "Account: " + this.account.getAccountNumber() + "\nSessionID: " +
+                this.clientId +"\nTime Alive: " + this.timeAlive + "\nAlive: " + this.alive;
     }
 }
