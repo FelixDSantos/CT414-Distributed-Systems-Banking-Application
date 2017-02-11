@@ -1,0 +1,3 @@
+grant codeBase "file:/D:/Projects/CT-414-Distributed-Systems-Banking-Application/src/"{
+    permission java.security.AllPermission;
+};
