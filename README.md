@@ -33,3 +33,34 @@ The ATM client application can be run at the command line using the parameters s
 The statement for account 100 for the period shown is returned and printed out using the accessor methods in the statement object
 The assignment should be done in groups of two students. Where the assignment is submitted by one student then don't forget to mention the name and ID number of the other person in your group so that they will also be credited for the assignment. When completed you should submit copies of the source code you have written for the assignment as well as a description of how you tested it and screen shots of the application running. All submissions should be done via Blackboard and if you submit more than one attempt then only the final attempt will be marked.
 
+The ATM client application can be run at the command line using the parameters shown and a full GUI based client application is not required. The first operation that is called is login and if this succeeds a session ID is returned which is then valid for some predefined time period. This session ID then acts as an authentication token that must be passed for each of the other remote methods. Running the application will then look something like this:
+
+C:\>rmiregistry 7777
+
+Then, start the server
+C:\>java Bank 7777
+
+Finally, test the ATM client application
+C:\>java ATM localhost 7777 login user1 pass1
+
+Successful login for user1 session is valid for 5 minutes
+
+C:\>java ATM localhost 7777 inquiry 100
+
+The current balance of account 100 is €1000
+
+C:\>java ATM localhost 7777 deposit 100 200 
+
+Successfully deposited €200 to account 100!
+
+C:\>java ATM localhost 7777 withdraw 100 50
+
+Successfully withdrew €50 from account 100!
+
+C:\>java ATM localhost 7777 inquiry 100
+
+The current balance of account 100 is €1150
+
+C:\>java ATM localhost 7777 statement 100 01/10/2016 31/12/2016
+
+The statement for account 100 for the period shown is returned and printed out using the accessor methods in the statement object
