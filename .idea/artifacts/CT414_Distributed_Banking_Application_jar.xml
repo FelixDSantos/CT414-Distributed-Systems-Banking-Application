@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="CT414_Distributed_Banking_Application:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/CT414_Distributed_Banking_Application_jar</output-path>
-    <root id="archive" name="CT414 Distributed Banking Application.jar">
-      <element id="module-output" name="CT414 Distributed Banking Application" />
-    </root>
-  </artifact>
-</component>
