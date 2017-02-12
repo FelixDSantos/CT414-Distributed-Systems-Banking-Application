@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by I320246 on 31/01/2017.
@@ -45,14 +46,11 @@ public class Statement implements StatementInterface, Serializable {
 
     @Override
     public List getTransations() {
-        for(Transaction t : this.account.getTransactions()){
-            if(t.getDate().equals(this.startDate) || t.getDate().after(this.startDate)){
-                relevantTransactions.add(t);
-            }
-            else if(!t.getDate().before(this.endDate)){
-                relevantTransactions.add(t);
-            }
-        }
+        this.account.getTransactions().stream()
+                .filter(dates -> dates.getDate().after(this.startDate) && dates.getDate().before(this.endDate))
+                .collect(Collectors.toList())
+                .forEach(date -> relevantTransactions.add(date));
+
         return this.relevantTransactions;
     }
 }

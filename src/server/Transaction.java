@@ -1,6 +1,7 @@
 package server;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -11,11 +12,14 @@ public class Transaction implements Serializable {
     private Date date;
     private String type;
     private double amount;
-    private int accountNumber;
+    private Account account;
+    private double accBalance;
 
-    public Transaction(int acnum, String type) {
-        this.accountNumber = acnum;
+    public Transaction(Account account, String type) {
+        this.account = account;
+        this.accBalance = 0;
         this.type = type;
+        date = new Date(System.currentTimeMillis());
     }
 
 
@@ -23,20 +27,13 @@ public class Transaction implements Serializable {
         return date;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public int getAccountNumber() {
-        return accountNumber;
+        return this.account.getAccountNumber();
     }
 
-    public void setAccountNumber(int accountNumber) {
-        this.accountNumber = accountNumber;
-    }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {
@@ -44,15 +41,21 @@ public class Transaction implements Serializable {
     }
 
     public double getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(double amount) {
+        double amt = this.account.getBalance();
+        this.accBalance = this.type.equals("Deposit")?this.accBalance = amt + this.amount : amt - this.amount;
         this.amount = amount;
     }
 
     @Override
     public String toString() {
-        return this.date.toString() + " " + this.type + " " + this.amount;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        if(this.type.equals("Deposit"))
+            return dateFormat.format(this.date) + "\t" + this.type + "\t\t\t" + this.amount + "\t\t" + this.accBalance;
+        else
+            return dateFormat.format(this.date) + "\t" + this.type + "\t\t" + this.amount + "\t\t" + this.accBalance;
     }
 }

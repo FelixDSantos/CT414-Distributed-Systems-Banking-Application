@@ -30,7 +30,8 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     public static void main(String args[]) throws Exception {
         try {
-//            System.setSecurityManager(new SecurityManager());
+            System.setProperty("java.security.policy", "file:/D:/Projects/CT414-Distributed-Systems-Banking-Application/src/all.policy");
+            System.setSecurityManager(new SecurityManager());
             System.out.println("\n--------------------\nSecurity Manager Set");
             String name = "Bank";
             BankInterface bank = new Bank();
@@ -48,9 +49,9 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
         for(Account acc : accounts) {
             if(username.equals(acc.getUserName()) && password.equals(acc.getPassword())){
                 System.out.println(">> Account " + acc.getAccountNumber() + " logged in");
-                Session s = new Session(String.valueOf(acc.getAccountNumber()), acc);
+                Session s = new Session(acc);
                 sessions.add(s);
-                return Long.parseLong(s.getClientId());
+                return s.sessionId;
             }
         }
         throw new InvalidLoginException();
@@ -58,14 +59,13 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     @Override
     public double deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+        if(checkSessionActive(sessionID)) {
             Account account;
             try {
                 account = getAccount(accountnum);
                 account.setBalance(account.getBalance() + amount);
-                Transaction t = new Transaction(accountnum, "Deposit");
+                Transaction t = new Transaction(account, "Deposit");
                 t.setAmount(amount);
-                t.setDate(new Date(System.currentTimeMillis()));
                 account.addTransaction(t);
 
                 System.out.println(">> E" + amount + " deposited to account " + accountnum + "\n");
@@ -79,23 +79,22 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     }
 
     @Override
-    public double withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+    public double withdraw(int accountnum, int amount, long sessionID) throws RemoteException,
+            InsufficientFundsException, InvalidSessionException {
+        if(checkSessionActive(sessionID)) {
             try {
                 Account account = getAccount(accountnum);
-                if (account.getBalance() > 0 && account.getBalance() - amount > 0) {
+                if (account.getBalance() > 0 && account.getBalance() - amount >= 0) {
                     account.setBalance(account.getBalance() - amount);
 
-                    Transaction t = new Transaction(accountnum, "Withdrawal");
-                    t.setAmount(accountnum);
-                    t.setDate(new Date(System.currentTimeMillis()));
+                    Transaction t = new Transaction(account, "Withdrawal");
+                    t.setAmount(amount);
                     account.addTransaction(t);
 
                     System.out.println(">> E" + amount + " withdrawn from account " + accountnum + "\n");
-
                     return account.getBalance();
                 }
-                else System.out.println("Insufficient Funds");
+                else throw new InsufficientFundsException();
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
@@ -105,7 +104,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     @Override
     public Account inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+        if(checkSessionActive(sessionID)) {
             try {
                 Account account = getAccount(accountnum);
                 System.out.println(">> Balance requested for account " + accountnum + "\n");
@@ -118,12 +117,16 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     }
 
     @Override
-    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException, StatementException {
-        if(checkSessionActive(accountnum)) {
+    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException,
+           InvalidSessionException, StatementException {
+        if(checkSessionActive(sessionID)) {
             try {
                 Account account = getAccount(accountnum);
+
+                System.out.println(">> Statement requested for account " + accountnum +
+                        " between " + from.toString() + " " + to.toString() + "\n");
+
                 Statement s = new Statement(account, from, to);
-                System.out.println(account.getTransactions().size());
                 return s;
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
@@ -135,7 +138,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     @Override
     public Account accountDetails(long sessionID) throws InvalidSessionException {
         for(Session s:sessions){
-            if(Long.valueOf(s.getClientId()) == sessionID){
+            if(s.getClientId() == sessionID){
                 return s.getAccount();
             }
         }
@@ -151,10 +154,9 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
         throw new InvalidAccountException(acnum);
     }
 
-    private boolean checkSessionActive(int acNum) throws InvalidSessionException{
-        String accNum = String.valueOf(acNum);
+    private boolean checkSessionActive(long acNum) throws InvalidSessionException{
         for(Session s : sessions){
-            if(s.getClientId().equals(accNum) && s.isAlive()) {
+            if(s.getClientId() == acNum && s.isAlive()) {
                 System.out.println(">> Session " + s.getClientId() + " running for " + s.getTimeAlive() + "s");
                 System.out.println(">> Time Remaining: " + (s.getMaxSessionLength() - s.getTimeAlive()) + "s");
                 return true;
@@ -166,7 +168,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
             }
         }
         System.out.println();
-        
+
         // cleanup dead sessions
         sessions.removeAll(deadSessions);
         throw new InvalidSessionException();

@@ -10,23 +10,23 @@ import java.util.TimerTask;
  */
 public class Session extends TimerTask implements Serializable{
 
-    private String clientId;
     private int timeAlive;
     private Timer timer;
     private volatile boolean alive;
     private Account account;
+    public long sessionId;
 
     private static final int MAX_SESSION_LENGTH = 60 * 5;
     private static final long DELAY = 1000;
 
-    public Session(String clientId, Account account) {
-        this.clientId = clientId;
+    public Session(Account account) {
+        this.sessionId = (int)(Math.random()*9000)+1000;
         this.account = account;
         this.alive = true;
         this.timeAlive = 0;
         this.timer = new Timer();
         this.startTimer();
-        System.out.println(">> Session " + clientId + " created\n");
+        System.out.println(">> Session " + sessionId + " created\n");
     }
 
     private void startTimer() {
@@ -39,7 +39,7 @@ public class Session extends TimerTask implements Serializable{
         if(this.timeAlive == MAX_SESSION_LENGTH) {
             this.alive = false;
             this.timer.cancel();
-            System.out.println("\n---------------------------\nSession " + this.clientId + " terminated \n---------------------------");
+            System.out.println("\n---------------------------\nSession " + this.sessionId + " terminated \n---------------------------");
             System.out.println(this);
             System.out.println("---------------------------");
         }
@@ -49,8 +49,8 @@ public class Session extends TimerTask implements Serializable{
         return this.alive;
     }
 
-    public String getClientId(){
-        return this.clientId;
+    public long getClientId(){
+        return this.sessionId;
     }
 
     public int getTimeAlive(){
@@ -68,6 +68,6 @@ public class Session extends TimerTask implements Serializable{
     @Override
     public String toString() {
         return "Account: " + this.account.getAccountNumber() + "\nSessionID: " +
-                this.clientId +"\nTime Alive: " + this.timeAlive + "\nAlive: " + this.alive;
+                this.sessionId +"\nTime Alive: " + this.timeAlive + "\nAlive: " + this.alive;
     }
 }
