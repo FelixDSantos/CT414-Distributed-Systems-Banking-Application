@@ -25,7 +25,6 @@ public class ATM {
             String name = "Bank";
             Registry registry = LocateRegistry.getRegistry(serverPort);
             bank = (BankInterface) registry.lookup(name);
-            System.out.println(sessionID);
             System.out.println("\n----------------\nClient Connected" + "\n----------------\n");
         } catch (InvalidArgumentException ie){
             ie.printStackTrace();

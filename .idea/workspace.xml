@@ -7,15 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1db1cb9-fc3d-4445-860d-cd480d175dbc" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/exceptions/InsufficientFundsException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/all.policy" afterPath="$PROJECT_DIR$/src/all.policy" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/client/ATM.java" afterPath="$PROJECT_DIR$/src/client/ATM.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/interfaces/BankInterface.java" afterPath="$PROJECT_DIR$/src/interfaces/BankInterface.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/Bank.java" afterPath="$PROJECT_DIR$/src/server/Bank.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/Session.java" afterPath="$PROJECT_DIR$/src/server/Session.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/Statement.java" afterPath="$PROJECT_DIR$/src/server/Statement.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server/Transaction.java" afterPath="$PROJECT_DIR$/src/server/Transaction.java" />
     </list>
     <ignored path="CT414 Distributed Banking Application.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -84,8 +76,8 @@
       <file leaf-file-name="ATM.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/client/ATM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="28" column="83" lean-forward="false" selection-start-line="28" selection-start-column="83" selection-end-line="28" selection-end-column="83" />
+            <state relative-caret-position="240">
+              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -772,7 +764,7 @@
       <workItem from="1486482722305" duration="1659000" />
       <workItem from="1486564718299" duration="7785000" />
       <workItem from="1486638355195" duration="55100000" />
-      <workItem from="1486911251343" duration="10855000" />
+      <workItem from="1486911251343" duration="11454000" />
     </task>
     <task id="LOCAL-00001" summary="Update code">
       <created>1485882977436</created>
@@ -792,7 +784,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="87612000" />
+    <option name="totallyTimeSpent" value="88211000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1324,8 +1316,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/client/ATM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="28" column="83" lean-forward="false" selection-start-line="28" selection-start-column="83" selection-end-line="28" selection-end-column="83" />
+        <state relative-caret-position="240">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
