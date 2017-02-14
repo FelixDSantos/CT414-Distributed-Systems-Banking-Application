@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by I320246 on 25/01/2017.
- */
+//Account class, which holds user details, transactions and balance
 public class Account implements Serializable {
-
+    //Instance variables for each account object
     private double balance;
     private String username, password;
     private int accountNumber;
-    private static int nextAcNum = 88769912;
     private List<Transaction> transactions;
+
+    //static variable to control account numbers
+    private static int nextAcNum = 88769912;
 
     public Account (String uName, String pass) {
         this.transactions = new ArrayList<>();
@@ -21,13 +21,16 @@ public class Account implements Serializable {
         this.password = pass;
         this.accountNumber = nextAcNum;
         this.balance = 0;
+        //increment account number, so next one will be updated
         nextAcNum++;
     }
 
+    //add new transactions to the account
     public void addTransaction(Transaction t) {
         this.transactions.add(t);
     }
 
+    //getters and setters
     public String getUserName() {
         return username;
     }

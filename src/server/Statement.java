@@ -6,12 +6,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Created by I320246 on 31/01/2017.
- */
 public class Statement implements StatementInterface, Serializable {
-
+    //Instance variables for each Statement object
     private List<Transaction> relevantTransactions;
     private Date startDate, endDate;
     private Account account;
@@ -45,14 +43,15 @@ public class Statement implements StatementInterface, Serializable {
 
     @Override
     public List getTransations() {
-        for(Transaction t : this.account.getTransactions()){
-            if(t.getDate().equals(this.startDate) || t.getDate().after(this.startDate)){
-                relevantTransactions.add(t);
-            }
-            else if(!t.getDate().before(this.endDate)){
-                relevantTransactions.add(t);
-            }
-        }
+        //Get all the relevantTransactions for the dates passed in
+        this.account.getTransactions().stream()
+                //filter transactions based on if the date is before the given date or not
+                .filter(transactions -> transactions.getDate().after(this.startDate) && transactions.getDate().before(this.endDate))
+                //create list from these filtered transactions
+                .collect(Collectors.toList())
+                //for each transaction in the list, add it to the relevantTransactions list that will be returned
+                .forEach(date -> relevantTransactions.add(date));
+
         return this.relevantTransactions;
     }
 }

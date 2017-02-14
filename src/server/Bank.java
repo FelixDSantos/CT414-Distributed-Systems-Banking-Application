@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+//Bank Class which implements all the methods defined in the BankInterface
 public class Bank extends UnicastRemoteObject implements BankInterface {
 
     private List<Account> accounts; // users accounts
@@ -19,6 +20,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     public Bank() throws RemoteException
     {
         super();
+        //set up ArrayLists and create test accounts
         accounts = new ArrayList<>();
         sessions = new ArrayList<>();
         deadSessions = new ArrayList<>();
@@ -30,8 +32,12 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     public static void main(String args[]) throws Exception {
         try {
-//            System.setSecurityManager(new SecurityManager());
+            //Set up securitymanager for server, and specify path to the policy file
+            System.setProperty("java.security.policy", "file:/D:/Projects/CT414-Distributed-Systems-Banking-Application/src/all.policy");
+            System.setSecurityManager(new SecurityManager());
             System.out.println("\n--------------------\nSecurity Manager Set");
+
+            //Add bank to the RMI registry so it can be located by the client
             String name = "Bank";
             BankInterface bank = new Bank();
             Registry registry = LocateRegistry.getRegistry(Integer.parseInt(args[0]));
@@ -45,31 +51,37 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
 
     @Override
     public long login(String username, String password) throws RemoteException, InvalidLoginException {
+        //Loop through the accounts to find the correct one for given username and password
         for(Account acc : accounts) {
             if(username.equals(acc.getUserName()) && password.equals(acc.getPassword())){
                 System.out.println(">> Account " + acc.getAccountNumber() + " logged in");
-                Session s = new Session(String.valueOf(acc.getAccountNumber()), acc);
+                //Create a new session on Successfull login, and return ID to the client
+                Session s = new Session(acc);
                 sessions.add(s);
-                return Long.parseLong(s.getClientId());
+                return s.sessionId;
             }
         }
+        //Throw exception if login details are not valid
         throw new InvalidLoginException();
     }
 
     @Override
-    public double deposit(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+    public double deposit(int accountnum, double amount, long sessionID) throws RemoteException, InvalidSessionException {
+        //Check if user session is active, based on sessionID passed by client
+        if(checkSessionActive(sessionID)) {
             Account account;
             try {
+                //Get the correct account
                 account = getAccount(accountnum);
                 account.setBalance(account.getBalance() + amount);
-                Transaction t = new Transaction(accountnum, "Deposit");
+                //Create transaction object for this transaction and add to the account
+                Transaction t = new Transaction(account, "Deposit");
                 t.setAmount(amount);
-                t.setDate(new Date(System.currentTimeMillis()));
                 account.addTransaction(t);
 
                 System.out.println(">> E" + amount + " deposited to account " + accountnum + "\n");
 
+                //return balance to client
                 return account.getBalance();
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
@@ -79,34 +91,41 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     }
 
     @Override
-    public double withdraw(int accountnum, int amount, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+    public double withdraw(int accountnum, double amount, long sessionID) throws RemoteException,
+            InsufficientFundsException, InvalidSessionException {
+        //Check if user session is active, based on sessionID passed by client
+        if(checkSessionActive(sessionID)) {
             try {
+                //Get correct user account based on accountnum
                 Account account = getAccount(accountnum);
-                if (account.getBalance() > 0 && account.getBalance() - amount > 0) {
+                //Check if withdrawal can be made, based on account balance
+                if (account.getBalance() > 0 && account.getBalance() - amount >= 0) {
                     account.setBalance(account.getBalance() - amount);
 
-                    Transaction t = new Transaction(accountnum, "Withdrawal");
-                    t.setAmount(accountnum);
-                    t.setDate(new Date(System.currentTimeMillis()));
+                    //create new Transaction and add to account
+                    Transaction t = new Transaction(account, "Withdrawal");
+                    t.setAmount(amount);
                     account.addTransaction(t);
 
                     System.out.println(">> E" + amount + " withdrawn from account " + accountnum + "\n");
 
+                    //return updated balance
                     return account.getBalance();
                 }
-                else System.out.println("Insufficient Funds");
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
-        return 0;
+        //Throw exception if account doesn't have enough money to withdraw
+        throw new InsufficientFundsException();
     }
 
     @Override
     public Account inquiry(int accountnum, long sessionID) throws RemoteException, InvalidSessionException {
-        if(checkSessionActive(accountnum)) {
+        //Check if session is active based on sessionID that is passed in
+        if(checkSessionActive(sessionID)) {
             try {
+                //Get account and return to the client
                 Account account = getAccount(accountnum);
                 System.out.println(">> Balance requested for account " + accountnum + "\n");
                 return account;
@@ -118,47 +137,66 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
     }
 
     @Override
-    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException, InvalidSessionException, StatementException {
-        if(checkSessionActive(accountnum)) {
+    public Statement getStatement(int accountnum, Date from, Date to, long sessionID) throws RemoteException,
+           InvalidSessionException, StatementException {
+        //Check if the session is active based on sessionID from client
+        if(checkSessionActive(sessionID)) {
             try {
+                //Get correct user account
                 Account account = getAccount(accountnum);
+
+                System.out.println(">> Statement requested for account " + accountnum +
+                        " between " + from.toString() + " " + to.toString() + "\n");
+                //Create new statement using the account and the dates passed from the client
                 Statement s = new Statement(account, from, to);
-                System.out.println(account.getTransactions().size());
                 return s;
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
+        //throw exception if statement cannot be generated
         throw new StatementException("Could not generate statement for given account and dates");
     }
 
     @Override
     public Account accountDetails(long sessionID) throws InvalidSessionException {
+        //Get account details based on the session ID
+        //Each session has an associated account, so the accounts can be retrieved based on a session
+        //Used on the client for looking up accounts
         for(Session s:sessions){
-            if(Long.valueOf(s.getClientId()) == sessionID){
+            if(s.getClientId() == sessionID){
                 return s.getAccount();
             }
         }
+        //Throw exception if session isn't valid
         throw new InvalidSessionException();
     }
 
     private Account getAccount(int acnum) throws InvalidAccountException{
+        //Loop through the accounts to find one corresponding to account number passed from the client
+        //and return it
         for(Account acc:accounts){
             if(acc.getAccountNumber() == acnum){
                 return  acc;
             }
         }
+        //Throw exception if account does not exist
         throw new InvalidAccountException(acnum);
     }
 
-    private boolean checkSessionActive(int acNum) throws InvalidSessionException{
-        String accNum = String.valueOf(acNum);
+    private boolean checkSessionActive(long sessID) throws InvalidSessionException{
+        //Loop through the sessions
         for(Session s : sessions){
-            if(s.getClientId().equals(accNum) && s.isAlive()) {
+            //Checks if the sessionID passed from client is in the sessions list and active
+            if(s.getClientId() == sessID && s.isAlive()) {
+                //Prints session details and returns true if session is alive
                 System.out.println(">> Session " + s.getClientId() + " running for " + s.getTimeAlive() + "s");
                 System.out.println(">> Time Remaining: " + (s.getMaxSessionLength() - s.getTimeAlive()) + "s");
                 return true;
             }
+            //If session is in list, but timed out, add it to deadSessions list
+            //This flags timed out sessions for removeAll
+            //They will be removed next time this method is called
             if(!s.isAlive()) {
                 System.out.println("\n>> Cleaning up timed out sessions");
                 System.out.println(">> SessionID: " + s.getClientId());
@@ -166,9 +204,11 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
             }
         }
         System.out.println();
-        
-        // cleanup dead sessions
+
+        // cleanup dead sessions by removing them from sessions list
         sessions.removeAll(deadSessions);
+
+        //throw exception if sessions passed to client is not valid
         throw new InvalidSessionException();
     }
 }
