@@ -112,12 +112,12 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
                     //return updated balance
                     return account.getBalance();
                 }
-                else throw new InsufficientFundsException();
             } catch (InvalidAccountException e) {
                 e.printStackTrace();
             }
         }
-        return 0;
+        //Throw exception if account doesn't have enough money to withdraw
+        throw new InsufficientFundsException();
     }
 
     @Override
@@ -195,7 +195,7 @@ public class Bank extends UnicastRemoteObject implements BankInterface {
                 return true;
             }
             //If session is in list, but timed out, add it to deadSessions list
-            //This flaggs timed out sessions for removeAll
+            //This flags timed out sessions for removeAll
             //They will be removed next time this method is called
             if(!s.isAlive()) {
                 System.out.println("\n>> Cleaning up timed out sessions");
